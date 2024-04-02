@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 
 
 const registrationRegex = {
@@ -14,6 +15,16 @@ const registrationRegex = {
 }
 
 
+function validateId(id: string) {
+  return registrationRegex.id.test(id);
+}
+
+function validatePassword(password: string) {
+  return registrationRegex.password.test(password);
+}
 
 
-
+export const UserRegistrationService = {
+  validateId,
+  validatePassword
+}

@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
 import CommonStyles from "../styles/CommonStyles.tsx";
 import { Button, Card, Text, TextInput } from "react-native-paper";
 import DropDownPicker from 'react-native-dropdown-picker';
+import { UserRegistrationService } from "../services/userRegistration/UserResgistrationService.ts";
 
 
 const UserRegisterScreen = () => {
@@ -16,13 +17,38 @@ const UserRegisterScreen = () => {
   ]);
 
   const [id, setId] = useState('');
+  const [idValidationMessage, setIdValidationMessage] = useState('아이디: 영소문자로 시작하고 영소문자 또는 숫자로 이루어진 3~19자의 문자열');
+  useEffect(()=> {
+    if (id.length === 0) {
+      setIdValidationMessage('');
+      return;
+    }
+    if (UserRegistrationService.validateId(id)){
+      setIdValidationMessage('중복확인 버튼을 클릭하여 주세요.');
+    } else {
+      setIdValidationMessage('아이디: 영소문자로 시작하고 영소문자 또는 숫자로 이루어진 3~19자의 문자열');
+    }
+  }, [id])
+
   const [password, setPassword] = useState('');
+  const [passwordValidationMessage, setPasswordValidationMessage] = useState('비밀번호: 최소 10자리 이상의 영어 대문자, 소문자, 숫자, 특수문자 중 2종류 조합');
+  useEffect(()=> {
+    if (password.length === 0) {
+      setPasswordValidationMessage('');
+      return;
+    }
+    if (UserRegistrationService.validateId(id)){
+      setPasswordValidationMessage('유효한 비밀번호 형식입니다');
+    } else {
+      setPasswordValidationMessage('비밀번호: 최소 10자리 이상의 영어 대문자, 소문자, 숫자, 특수문자 중 2종류 조합');
+    }
+  }, [password])
+
   const [passwordCheck, setPasswordCheck] = useState('');
   const [name, setName] = useState('');
   const [company, setCompany] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
-
 
 
 
@@ -46,7 +72,7 @@ const UserRegisterScreen = () => {
             activeOutlineColor={"rgb(85, 114, 83)"}
             style={{marginHorizontal: 10, marginBottom: 1}}
           />
-          <Text style={{marginHorizontal: 25, marginBottom: 1}}>{}</Text>
+          <Text style={{marginHorizontal: 25, marginBottom: 1}}>{idValidationMessage}</Text>
 
           <TextInput
             label="비밀번호"
@@ -58,7 +84,7 @@ const UserRegisterScreen = () => {
             activeOutlineColor={"rgb(85, 114, 83)"}
             style={{marginHorizontal: 10, marginBottom: 1}}
           />
-          <Text style={{marginHorizontal: 25, marginBottom: 1}}>{}</Text>
+          <Text style={{marginHorizontal: 25, marginBottom: 1}}>{passwordValidationMessage}</Text>
 
           <TextInput
             label="비밀번호 확인"
@@ -86,6 +112,7 @@ const UserRegisterScreen = () => {
 
           <View style={{zIndex: 100}}>
             <DropDownPicker
+              placeholder={"소속을 선택하여주세요"}
               open={companySelectOpen}
               value={companySelectValue}
               items={companySelectItems}
@@ -97,8 +124,7 @@ const UserRegisterScreen = () => {
               scrollViewProps={{
                 nestedScrollEnabled: true,
               }}
-              style={{marginHorizontal: 10, marginBottom: 1, width: '94%'}}
-              placeholder={"소속을 선택하여주세요"}
+              style={{marginHorizontal: 10, marginBottom: 1, width: '94%', borderColor: "rgb(170, 170, 170)", borderRadius: 5}}
               dropDownContainerStyle={{marginHorizontal: 10, marginBottom: 1, width: '94%'}}
             />
           </View>
