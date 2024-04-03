@@ -8,8 +8,8 @@ import HomeScreen from "./screens/HomeScreen.tsx";
 import UserRegisterScreen from "./screens/UserRegisterScreen.tsx";
 
 const Stack = createNativeStackNavigator();
-
 const Main = () => {
+  // @ts-ignore
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="LoadingScreen">

@@ -7,6 +7,7 @@ import DialogWithLoadingIndicator from "../components/progressing/ProgressDialog
 import { AuthenticationService } from "../services/login/AuthenticationService.ts";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { NavigationTypes } from "../types/NavigationTypes.ts";
+import { UserRegistrationService } from "../services/userRegistration/UserResgistrationService.ts";
 
 const LoginScreen = () => {
 
@@ -34,6 +35,13 @@ const LoginScreen = () => {
     } finally {
       setVisible(false);
     }
+  }
+
+  async function registrationScreenNavigate(){
+    const request = await UserRegistrationService.getAvailableCompanyList();
+    const companyNameList = UserRegistrationService.processCompanyNameListForSelect(request)
+    // @ts-ignore
+    navigation.navigate('UserRegisterScreen', { companyNameList : companyNameList })
   }
 
 
@@ -97,7 +105,7 @@ const LoginScreen = () => {
         </Text>
 
         <TouchableRipple
-          onPress={()=> navigation.navigate('UserRegisterScreen')}
+          onPress={registrationScreenNavigate}
         >
           <Text
             style={{textDecorationLine: "underline"}}

@@ -1,4 +1,31 @@
-import { useEffect } from "react";
+import axios from "axios";
+
+async function getAvailableCompanyListRequest() {
+  const response = await axios.get('http://snd.synology.me:8081/api/user/register/get/companyName/active');
+  return response.data;
+}
+
+
+function processCompanyNameListForSelect(data: CompanyNameResponse){
+  const companyNameList =  data.data;
+  const companyNameListArray: { label: string; value: string }[] =  companyNameList.map(item => ({
+    label: item.companyName,
+    value: item.companyName
+  }));
+  companyNameListArray.unshift({label: '소속을 선택하여주세요', value: 'default'});
+  return companyNameListArray;
+}
+
+
+async function checkDuplicatedIdRequest(id: string) {
+  const response = await axios.post('http://snd.synology.me:8081/api/user/register/checkId', {id : id});
+  return response.data;
+}
+
+async function registerUserRequest(formData: any){
+  const response = await axios.post('http://snd.synology.me:8081/api/user/register/register', formData);
+  return response.data;
+}
 
 
 const registrationRegex = {
@@ -20,11 +47,38 @@ function validateId(id: string) {
 }
 
 function validatePassword(password: string) {
+  console.log(registrationRegex.password.test(password));
   return registrationRegex.password.test(password);
+}
+
+function validatePasswordCheck(password: string, passwordCheck: string) {
+  let passwordCheckValidity = registrationRegex.password.test(passwordCheck);
+  let passwordEquality = password === passwordCheck;
+  return passwordCheckValidity && passwordEquality;
+}
+
+function validateNameCheck(name: string) {
+  return registrationRegex.name.test(name);
+}
+
+function validatePhoneCheck(phone: string) {
+  return registrationRegex.phone.test(phone);
+}
+
+function validateEmailCheck(email: string) {
+  return registrationRegex.email.test(email);
 }
 
 
 export const UserRegistrationService = {
   validateId,
-  validatePassword
+  validatePassword,
+  validatePasswordCheck,
+  validateNameCheck,
+  validatePhoneCheck,
+  validateEmailCheck,
+  getAvailableCompanyList: getAvailableCompanyListRequest,
+  processCompanyNameListForSelect,
+  checkDuplicatedIdRequest,
+  registerUserRequest
 }

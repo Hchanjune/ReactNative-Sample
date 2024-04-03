@@ -17,6 +17,22 @@ const CommonStyles = StyleSheet.create({
 
 
 
+  selectViewWithTitle: {
+    marginHorizontal: 10,
+    marginBottom: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    zIndex: 100,
+    backgroundColor: 'rgb(255, 251, 254)',
+    //backgroundColor: 'red',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: "rgb(170, 170, 170)",
+    borderRadius: 5,
+    maxWidth: '100%',
+    height: 55
+  }
+
 });
 
 
