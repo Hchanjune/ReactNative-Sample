@@ -1,25 +1,26 @@
 import React, { useState } from "react";
 import {PaperProvider} from "react-native-paper"
 import Main from "./Main"
-import { SnackbarProvider } from "./components/snackbar/SnackbarContext.tsx";
+import { SnackbarProvider } from "./context/SnackbarContext.tsx";
+import { LoadingProvider } from "./context/LoadingContext.tsx";
 
-const EntryPoint = () => {
+const EntryPoint: React.FC = () => {
+
+
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-
-  // Snackbar를 표시하는 함수
   const showSnackbar = (message: string) => {
     setSnackbarMessage(message);
     setSnackbarVisible(true);
   };
-
-  // Snackbar를 숨기는 함수
   const hideSnackbar = () => setSnackbarVisible(false);
 
   return (
     <PaperProvider>
       <SnackbarProvider>
-        <Main />
+        <LoadingProvider>
+          <Main />
+        </LoadingProvider>
       </SnackbarProvider>
     </PaperProvider>
   )

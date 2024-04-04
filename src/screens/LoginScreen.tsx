@@ -1,21 +1,27 @@
 import React, { useEffect, useState } from "react";
-import { Keyboard, TouchableWithoutFeedback, View } from "react-native";
+import { Alert, BackHandler, Keyboard, TouchableWithoutFeedback, View } from "react-native";
 import LogoSvg  from '../assets/svg/rereLogoBadge.svg';
 import CommonStyles from "../styles/CommonStyles.tsx";
 import { Button, Text, TextInput, TouchableRipple } from "react-native-paper";
-import DialogWithLoadingIndicator from "../components/progressing/ProgressDialog.tsx";
 import { AuthenticationService } from "../services/login/AuthenticationService.ts";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { NavigationTypes } from "../types/NavigationTypes.ts";
 import { UserRegistrationService } from "../services/userRegistration/UserResgistrationService.ts";
+import { useLoading } from "../context/LoadingContext.tsx";
+import { BackHandlerService } from "../services/BackHandlerService.tsx";
+import JsonWebTokenStorageService from "../services/login/JsonWebTokenStorageService.ts";
+import { JsonWebToken } from "../types/interface/JsonWebToken.ts";
 
 const LoginScreen = () => {
+
+  BackHandlerService.registerExitBackHandler()
+
+  const {startLoading, stopLoading} = useLoading();
 
   const navigation = useNavigation<NavigationProp<NavigationTypes>>();
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
   const [resultMessage, setResultMessage] = useState('');
-  const [visible, setVisible] = useState(false);
 
   const loginHandler = async () => {
     if (!id || !password) {
@@ -23,17 +29,24 @@ const LoginScreen = () => {
       return;
     }
     Keyboard.dismiss();
-    setVisible(true);
+    startLoading();
     try {
       const loginData = await AuthenticationService.login(id, password);
       if (loginData.status === 'success') {
-        navigation.navigate('HomeScreen');
+        // Store Tokens
+        const tokens :JsonWebToken = JSON.parse(loginData.data);
+        await JsonWebTokenStorageService.saveTokens(tokens)
+        //navigation.navigate('HomeScreen');
+        navigation.reset({
+          index: 0,
+          routes: [{name: 'HomeScreen'}],
+        });
       }
     }  catch (error: any) {
         const errorMessage = AuthenticationService.loginException(error);
         setResultMessage(errorMessage);
     } finally {
-      setVisible(false);
+      stopLoading();
     }
   }
 
@@ -113,14 +126,6 @@ const LoginScreen = () => {
             사용자 신규 등록
           </Text>
         </TouchableRipple>
-
-
-        <DialogWithLoadingIndicator
-          title={"시스템 로그인"}
-          body={"로그인 처리중입니다..."}
-          visible={visible}
-          close={() => setVisible(false)}
-        />
 
       </View>
     </TouchableWithoutFeedback>

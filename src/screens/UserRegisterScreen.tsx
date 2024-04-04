@@ -1,3 +1,4 @@
+//@ts-nocheck
 import React, { useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { StackScreenProps } from "@react-navigation/stack";
@@ -7,12 +8,15 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import { UserRegistrationService } from "../services/userRegistration/UserResgistrationService.ts";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { NavigationTypes } from "../types/NavigationTypes.ts";
-import { useSnackbar } from "../components/snackbar/SnackbarContext.tsx";
+import { useSnackbar } from "../context/SnackbarContext.tsx";
+import { useLoading } from "../context/LoadingContext.tsx";
 
 type UserRegisterScreenProps = StackScreenProps<NavigationTypes, "UserRegisterScreen">;
 const UserRegisterScreen : React.FC<UserRegisterScreenProps> = ({navigation, route}) => {
 
   const { showSnackbar } = useSnackbar();
+
+  const { startLoading, stopLoading } = useLoading();
 
   const [formStatus, setFormStatus] = useState({
     id : false,
@@ -162,7 +166,6 @@ const UserRegisterScreen : React.FC<UserRegisterScreenProps> = ({navigation, rou
 
   const [companySelectOpen, setCompanySelectOpen] = useState(false);
   const [companySelectValue, setCompanySelectValue] = useState(null);
-  //@ts-ignore
   const [companySelectItems, setCompanySelectItems] = useState(
     route.params.companyNameList
   );
@@ -268,34 +271,54 @@ const UserRegisterScreen : React.FC<UserRegisterScreenProps> = ({navigation, rou
     }
   }
 
-  async function registerRequest(){
-    const formData = serializeRegisterForm();
-    const isIdAvailable = await UserRegistrationService.checkDuplicatedIdRequest(formData.id)
-    console.log(isIdAvailable);
-    if (!isIdAvailable.data) {
-      const registerProcess = await UserRegistrationService.registerUserRequest(formData);
-      console.log(registerProcess);
-      if (registerProcess.data) {
-        navigation.navigate('LoginScreen');
-        showSnackbar('가입이 성공적으로 이루어졌습니다.');
+  async function performNetworkRequest(requestFunc, onSuccess, onFailure) {
+    startLoading();
+    try {
+      const result = await requestFunc();
+      if (result) {
+        onSuccess();
       } else {
-        showSnackbar('네트워크 상태가 좋지 않습니다.');
+        onFailure();
       }
-    } else {
-      showSnackbar('사용 할 수 없는 ID 입니다. ID를 변경해주세요.');
-      setIdValidationMessage(prevState=> ({
-        ...prevState,
-        text: '사용 할 수 없는 ID 입니다. ID를 변경해주세요.',
-        color: 'red'
-      }));
-      setFormStatus(prevState => ({
-        ...prevState,
-        id: false
-      }));
+    } catch (error) {
+      showSnackbar('네트워크 상태가 좋지 않습니다. 잠시 후 다시 시도하여 주세요.');
+    } finally {
+      stopLoading();
     }
   }
 
-  // @ts-ignore
+  async function registerRequest() {
+    const formData = serializeRegisterForm();
+
+    // 중복 ID 체크
+    await performNetworkRequest(
+      async () => await UserRegistrationService.checkDuplicatedIdRequest(formData.id),
+      async () => {
+        // ID 사용 가능 시, 사용자 등록 요청
+        await performNetworkRequest(
+          async () => await UserRegistrationService.registerUserRequest(formData),
+          () => {
+            navigation.navigate('LoginScreen');
+            showSnackbar('가입이 성공적으로 이루어졌습니다.');
+          },
+          () => showSnackbar('네트워크 상태가 좋지 않습니다. 잠시후 다시 시도하여주세요.')
+        );
+      },
+      () => {
+        showSnackbar('사용할 수 없는 ID 입니다. ID를 변경해주세요.');
+        setIdValidationMessage(prevState => ({
+          ...prevState,
+          text: '사용할 수 없는 ID 입니다. ID를 변경해주세요.',
+          color: 'red'
+        }));
+        setFormStatus(prevState => ({
+          ...prevState,
+          id: false
+        }));
+      }
+    );
+  }
+
   return(
     <View style={[CommonStyles.ContainerFlexCentered, CommonStyles.backGroundPrimary50]}>
       <ScrollView

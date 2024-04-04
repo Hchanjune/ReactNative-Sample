@@ -17,14 +17,16 @@ function processCompanyNameListForSelect(data: CompanyNameResponse){
 }
 
 
-async function checkDuplicatedIdRequest(id: string) {
+async function checkDuplicatedIdRequest(id: string): Promise<Boolean> {
   const response = await axios.post('http://snd.synology.me:8081/api/user/register/checkId', {id : id});
-  return response.data;
+  console.log("checkDuplicatedIdRequest", response.data);
+  return response.data.data === false;
 }
 
-async function registerUserRequest(formData: any){
+async function registerUserRequest(formData: any): Promise<Boolean>{
   const response = await axios.post('http://snd.synology.me:8081/api/user/register/register', formData);
-  return response.data;
+  console.log("registerUserRequest", response.data);
+  return response.data.data;
 }
 
 
@@ -47,7 +49,6 @@ function validateId(id: string) {
 }
 
 function validatePassword(password: string) {
-  console.log(registrationRegex.password.test(password));
   return registrationRegex.password.test(password);
 }
 

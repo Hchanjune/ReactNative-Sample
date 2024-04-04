@@ -1,18 +1,37 @@
 import React, { Component, useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { Alert, BackHandler, Text, View } from "react-native";
 import CommonStyles from "../styles/CommonStyles.tsx";
 import FastImage from "react-native-fast-image";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import {NavigationTypes} from "../types/NavigationTypes.ts";
+import { BackHandlerService } from "../services/BackHandlerService.tsx";
+import JsonWebTokenStorageService from "../services/login/JsonWebTokenStorageService.ts";
+import { AuthenticationService } from "../services/login/AuthenticationService.ts";
 
 
 const LoadingScreen = () => {
 
+  BackHandlerService.registerExitBackHandler()
+
   const navigation = useNavigation<NavigationProp<NavigationTypes>>();
 
   useEffect(() => {
-    setTimeout(()=>{
-      navigation.navigate('LoginScreen');
+
+    const tokenValidationCheck = async () => {
+      return await AuthenticationService.tokenValidation();
+    }
+
+
+
+    setTimeout(async ()=>{
+      //navigation.navigate('LoginScreen');
+      navigation.reset({
+        index: 0,
+        routes: [{name: await tokenValidationCheck() ? 'HomeScreen' : 'LoginScreen'}],
+      });
+      if (!await tokenValidationCheck()) {
+        //로그인 만료 메시지
+      }
     }, 3000);
   }, [navigation]);
 
