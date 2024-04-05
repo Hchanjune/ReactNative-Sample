@@ -73,7 +73,7 @@ const LoginScreen = () => {
             variant="displaySmall"
             style={{fontFamily: "KOTRA_BOLD-Bold"}}
           >
-            데이터관리시스템
+            ReactNativeSample
           </Text>
         </View>
 

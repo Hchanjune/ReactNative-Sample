@@ -6,16 +6,18 @@ import CommonStyles from "../styles/CommonStyles.tsx";
 import { useLoading } from "../context/LoadingContext.tsx";
 import { BackHandlerService } from "../services/BackHandlerService.tsx";
 import JsonWebTokenStorageService from "../services/login/JsonWebTokenStorageService.ts";
+import BottomNavBar from "../components/BottomNavigation.tsx";
 
 
-const HomeScreen = ({navigation}) => {
-  BackHandlerService.registerExitBackHandler()
+const MainContainerScreen = ({navigation}) => {
+  BackHandlerService.registerExitBackHandler();
+
   const { startLoading, stopLoading } = useLoading();
 
-
+  const [selectedTab, setSelectedTab] = useState('home');
   useEffect(() => {
 
-  }, []);
+  }, [selectedTab]);
 
 
   const logout = async () => {
@@ -33,12 +35,10 @@ const HomeScreen = ({navigation}) => {
         <Text>ReactNativeSample</Text>
         <IconButton icon={"logout-variant"} size={30} onPress={logout} />
       </View>
-      <View style={[CommonStyles.ContainerFlex, CommonStyles.backGroundPrimary50]}>
-        <Text>시스템에 오신것을 환영합니다.</Text>
-      </View>
+      <BottomNavBar onTabChange={(key) => setSelectedTab(key)} />
     </View>
   );
 }
 
 
-export default HomeScreen
+export default MainContainerScreen

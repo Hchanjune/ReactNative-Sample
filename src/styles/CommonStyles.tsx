@@ -1,11 +1,11 @@
 import { StyleSheet } from "react-native";
 
 const CommonStyles = StyleSheet.create({
-
   ContainerFlex: {
     flex: 1,
+    flexDirection: 'column',
     paddingVertical: 10,
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
   },
 
   ContainerFlexCentered: {

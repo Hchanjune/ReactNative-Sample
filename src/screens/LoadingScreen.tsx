@@ -5,8 +5,9 @@ import FastImage from "react-native-fast-image";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import {NavigationTypes} from "../types/NavigationTypes.ts";
 import { BackHandlerService } from "../services/BackHandlerService.tsx";
-import JsonWebTokenStorageService from "../services/login/JsonWebTokenStorageService.ts";
 import { AuthenticationService } from "../services/login/AuthenticationService.ts";
+import NetInfo from "@react-native-community/netinfo";
+import { AndroidPermissionsService } from "../services/permissions/AndroidPermissionsService.tsx";
 
 
 const LoadingScreen = () => {
@@ -16,23 +17,33 @@ const LoadingScreen = () => {
   const navigation = useNavigation<NavigationProp<NavigationTypes>>();
 
   useEffect(() => {
+    const prepareApp = async () => {
+      const netState = await NetInfo.fetch();
+      if (!netState.isConnected) {
+        Alert.alert("인터넷 연결 오류", "인터넷에 연결되어 있지 않습니다.");
+        return;
+      }
 
-    const tokenValidationCheck = async () => {
-      return await AuthenticationService.tokenValidation();
-    }
+      // 권한 요청
+      const locationGranted = await AndroidPermissionsService.requestLocationPermission();
+      const cameraGranted = await AndroidPermissionsService.requestCameraPermission();
+      //const storageGranted = await AndroidPermissionsService.requestExternalStoragePermission();
 
+      // 하나라도 권한이 거부된 경우
+      if (!locationGranted || !cameraGranted) {
+        Alert.alert("권한 오류", "앱에서 필요한 권한을 허용해주세요.");
+        return;
+      }
 
-
-    setTimeout(async ()=>{
-      //navigation.navigate('LoginScreen');
+      // 토큰 유효성 검사
+      const isAuthenticated = await AuthenticationService.tokenValidation();
       navigation.reset({
         index: 0,
-        routes: [{name: await tokenValidationCheck() ? 'HomeScreen' : 'LoginScreen'}],
+        routes: [{ name: isAuthenticated ? 'HomeScreen' : 'LoginScreen' }],
       });
-      if (!await tokenValidationCheck()) {
-        //로그인 만료 메시지
-      }
-    }, 3000);
+    };
+
+    prepareApp();
   }, [navigation]);
 
 
