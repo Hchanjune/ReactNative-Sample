@@ -34,6 +34,14 @@ function registerExitBackHandler() {
   });
 }
 
+function registerCallbackBackHandler(callback) {
+  useCustomBackAction(() => {
+    callback();
+    return true;
+  });
+}
+
 export const BackHandlerService = {
-  registerExitBackHandler
+  registerExitBackHandler,
+  registerCallbackBackHandler
 }

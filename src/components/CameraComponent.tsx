@@ -1,15 +1,29 @@
-import React, { useRef } from 'react';
-import { StyleSheet, View, TouchableOpacity, Text } from 'react-native';
+import React, {useEffect, useRef} from 'react';
+import {StyleSheet, View, TouchableOpacity, Text, Modal, BackHandler} from 'react-native';
 import { Camera, useCameraDevices, CameraRuntimeError, useCameraDevice } from "react-native-vision-camera";
-import { NavigationTypes } from "../types/NavigationTypes.ts";
-import { StackScreenProps } from "@react-navigation/stack";
+import {BackHandlerService} from "../services/BackHandlerService.tsx";
 
-type CameraComponentProps = StackScreenProps<NavigationTypes, "CameraComponent">;
-const CameraComponent : React.FC<CameraComponentProps> = ({navigation}) => {
+interface CameraComponentProps {
+  isVisible: boolean;
+  onPhotoTaken: (uri: string) => void;
+  onClose: () => void;
+}
+
+const CameraComponent: React.FC<CameraComponentProps> = ({ isVisible, onPhotoTaken, onClose }) => {
   const device = useCameraDevice('back');
   const cameraRef = useRef<Camera>(null);
 
-  const takePhoto = async () => {
+  useEffect(() => {
+    if (isVisible) {
+      const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+        onClose();
+        return true;
+      });
+
+      return () => backHandler.remove();
+    }
+  }, [isVisible, onClose]);
+/*  const takePhoto = async () => {
     if (cameraRef.current && device) {
       try {
 
@@ -24,32 +38,54 @@ const CameraComponent : React.FC<CameraComponentProps> = ({navigation}) => {
         }
       }
     }
+  };*/
+
+  const takePhoto = async () => {
+    if (cameraRef.current) {
+      const photo = await cameraRef.current.takePhoto({});
+      console.log(photo);
+      onPhotoTaken(photo.path);
+    }
   };
 
   if (device == null) return <View style={styles.container}><Text>No Camera Device Found</Text></View>;
 
   return (
-    <View style={styles.container}>
-      <Camera
-        ref={cameraRef}
-        style={StyleSheet.absoluteFill}
-        device={device}
-        enableZoomGesture={true}
-        photo={true}
-        isActive={true}
-      />
-      <TouchableOpacity onPress={takePhoto} style={styles.captureButton}>
-        <View style={styles.innerCircle} />
-      </TouchableOpacity>
-    </View>
+      <Modal
+          visible={isVisible}
+          transparent={false}
+          animationType="none"
+          onRequestClose={onClose}
+      >
+        <View style={styles.container}>
+          {device && (
+              <Camera
+                  ref={cameraRef}
+                  style={StyleSheet.absoluteFill}
+                  device={device}
+                  enableZoomGesture={true}
+                  photo={true}
+                  isActive={true}
+              />
+          )}
+          <TouchableOpacity onPress={takePhoto} style={styles.captureButton}>
+            <View style={styles.innerCircle} />
+          </TouchableOpacity>
+        </View>
+      </Modal>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 100
   },
   captureButton: {
     position: 'absolute',

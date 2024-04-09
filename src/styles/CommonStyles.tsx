@@ -69,4 +69,4 @@ const CommonStyles = StyleSheet.create({
 });
 
 
-export default CommonStyles
+export default CommonStyles;

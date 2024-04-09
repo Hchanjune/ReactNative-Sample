@@ -1,4 +1,3 @@
-//@ts-nocheck
 import React from "react";
 import {NavigationContainer} from "@react-navigation/native";
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
@@ -11,7 +10,7 @@ import CameraComponent from "./components/CameraComponent.tsx"
 import { NavigationTypes } from "./types/NavigationTypes.ts";
 
 const Stack = createNativeStackNavigator<NavigationTypes>();
-const Main = () => {
+const Main : React.FC = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="LoadingScreen">
@@ -20,10 +19,10 @@ const Main = () => {
         <Stack.Screen name="UserRegisterScreen" component={UserRegisterScreen} options={{ headerShown: false }} />
         <Stack.Screen name="HomeScreen" component={MainContainerScreen} options={{ headerShown: false }} />
 
-        <Stack.Screen name="CameraComponent" component={CameraComponent} options={{ headerShown: false }} />
+
     </Stack.Navigator>
     </NavigationContainer>
   );
 };
 
-export default Main
+export default Main;

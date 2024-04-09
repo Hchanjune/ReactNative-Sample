@@ -1,4 +1,5 @@
 export type NavigationTypes = {
+  LoadingScreen: undefined,
   LoginScreen: undefined,
   HomeScreen: {
     photoUri?: string
@@ -7,5 +8,4 @@ export type NavigationTypes = {
     companyNameList : CompanyNameList;
   },
 
-  CameraComponent: undefined
 }
