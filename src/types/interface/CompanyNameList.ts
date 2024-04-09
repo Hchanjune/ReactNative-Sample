@@ -2,7 +2,7 @@ interface CompanyName {
   companyName: string;
 }
 
-type CompanyNameList = []
+type CompanyNameList = string[];
 
 interface CompanyNameResponse {
   data : CompanyName[];

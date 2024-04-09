@@ -33,6 +33,12 @@ export const SnackbarProvider: React.FC<{ children: ReactNode }> = ({ children }
         visible={snackbarVisible}
         onDismiss={hideSnackbar}
         duration={Snackbar.DURATION_SHORT}
+        action={{
+          label: '확인',
+          onPress: () => {
+
+          },
+        }}
       >
         {snackbarMessage}
       </Snackbar>

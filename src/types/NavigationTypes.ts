@@ -1,7 +1,11 @@
 export type NavigationTypes = {
   LoginScreen: undefined,
-  HomeScreen: undefined,
+  HomeScreen: {
+    photoUri?: string
+  },
   UserRegisterScreen: {
     companyNameList : CompanyNameList;
   },
+
+  CameraComponent: undefined
 }

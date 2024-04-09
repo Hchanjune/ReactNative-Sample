@@ -7,10 +7,11 @@ import LoadingScreen from "./screens/LoadingScreen.tsx";
 import LoginScreen from "./screens/LoginScreen.tsx";
 import MainContainerScreen from "./screens/MainContainerScreen.tsx";
 import UserRegisterScreen from "./screens/UserRegisterScreen.tsx";
+import CameraComponent from "./components/CameraComponent.tsx"
+import { NavigationTypes } from "./types/NavigationTypes.ts";
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<NavigationTypes>();
 const Main = () => {
-  // @ts-ignore
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="LoadingScreen">
@@ -18,6 +19,8 @@ const Main = () => {
         <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
         <Stack.Screen name="UserRegisterScreen" component={UserRegisterScreen} options={{ headerShown: false }} />
         <Stack.Screen name="HomeScreen" component={MainContainerScreen} options={{ headerShown: false }} />
+
+        <Stack.Screen name="CameraComponent" component={CameraComponent} options={{ headerShown: false }} />
     </Stack.Navigator>
     </NavigationContainer>
   );
